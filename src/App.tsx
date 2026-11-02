@@ -109,13 +109,12 @@ function Avatar({
   candidate: Candidate;
   size?: "normal" | "small" | "large";
 }) {
-  const color = /^#[0-9a-fA-F]{6}$/.test(candidate.color) ? candidate.color : "#e4e9df";
-  const channels = [1, 3, 5].map((offset) => parseInt(color.slice(offset, offset + 2), 16));
-  const brightness = channels[0] * 0.299 + channels[1] * 0.587 + channels[2] * 0.114;
+  const palette = ["#d9effc", "#e5f7c2", "#bde5fa"];
+  const colorIndex = [...candidate.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % palette.length;
   return (
     <span
       className={`avatar avatar-${size}`}
-      style={{ backgroundColor: color, color: brightness < 155 ? "#ffffff" : "#263a34" }}
+      style={{ backgroundColor: palette[colorIndex], color: "#315e7a" }}
     >
       {candidate.initials}
     </span>
