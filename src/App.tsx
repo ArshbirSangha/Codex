@@ -7,19 +7,15 @@ import {
   ArrowUpRight,
   BookOpen,
   Check,
-  CheckCheck,
   ChevronDown,
   ChevronRight,
   CircleHelp,
   ClipboardCheck,
-  Clock3,
   ExternalLink,
   FileJson,
-  Fingerprint,
   Heart,
   Info,
   Landmark,
-  Leaf,
   ListChecks,
   MapPin,
   Menu,
@@ -27,7 +23,6 @@ import {
   RotateCcw,
   Scale,
   Search,
-  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   Upload,
@@ -50,58 +45,6 @@ const choices = [
 ];
 const contestIcons = [Landmark, UsersRound, BookOpen];
 
-function BallotIllustration() {
-  return (
-    <div className="ballot-art" aria-hidden="true">
-      <div className="art-orbit orbit-one" />
-      <div className="art-orbit orbit-two" />
-      <span className="art-spark spark-one">✦</span>
-      <span className="art-spark spark-two">✦</span>
-      <div className="art-leaf leaf-one" />
-      <div className="art-leaf leaf-two" />
-      <div className="illustrated-paper">
-        <div className="paper-top">
-          <span className="paper-logo">
-            <Vote size={17} />
-          </span>
-          <span>YOUR BALLOT</span>
-          <span className="paper-dot" />
-        </div>
-        <div className="paper-heading">
-          A little clarity.
-          <br />A lot of possibility.
-        </div>
-        <div className="paper-line long" />
-        <div className="paper-line short" />
-        {[0, 1, 2].map((i) => (
-          <div className="paper-choice" key={i}>
-            <span
-              className={i === 1 ? "paper-checkbox selected" : "paper-checkbox"}
-            >
-              {i === 1 && <Check size={17} strokeWidth={3} />}
-            </span>
-            <div>
-              <div className="paper-line" />
-              <div className="paper-line small" />
-            </div>
-          </div>
-        ))}
-        <div className="paper-footer">MAKE YOUR MARK.</div>
-      </div>
-      <div className="art-badge">
-        <span>
-          <CheckCheck size={19} />
-        </span>
-        <div>
-          Your values.
-          <br />
-          <strong>Your voice.</strong>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Avatar({
   candidate,
   size = "normal",
@@ -110,7 +53,11 @@ function Avatar({
   size?: "normal" | "small" | "large";
 }) {
   const palette = ["#d9effc", "#e5f7c2", "#bde5fa"];
-  const colorIndex = [...candidate.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % palette.length;
+  const colorIndex =
+    [...candidate.id].reduce(
+      (sum, character) => sum + character.charCodeAt(0),
+      0,
+    ) % palette.length;
   return (
     <span
       className={`avatar avatar-${size}`}
@@ -145,7 +92,6 @@ function App() {
     (sum, contest) => sum + contest.candidates.length,
     0,
   );
-  const progress = Math.round((answered / ballot.questions.length) * 100);
   const currentQuestion = ballot.questions[questionIndex];
   const currentAnswer = answers[currentQuestion.id];
   const matches = rankCandidates(ballot, answers, activeContest);
@@ -223,7 +169,7 @@ function App() {
       navigate("ballot");
       setImportText("");
       setImportError("");
-      setNotice("Your ballot is ready. Previous answers have been cleared.");
+      setNotice("Ballot imported. Answers cleared.");
     } catch (error) {
       setImportError(
         error instanceof Error
@@ -250,7 +196,7 @@ function App() {
   function resetAnswers() {
     setAnswers({});
     setQuestionIndex(0);
-    setNotice("Your answers have been cleared.");
+    setNotice("Answers cleared.");
     navigate("priorities");
   }
   function restoreSample() {
@@ -259,7 +205,7 @@ function App() {
     setQuestionIndex(0);
     setActiveContest(sampleBallot.contests[0].id);
     navigate("ballot");
-    setNotice("The fictional sample ballot has been restored.");
+    setNotice("Sample ballot restored.");
   }
 
   return (
@@ -288,17 +234,16 @@ function App() {
           </span>
           ballotwise<span className="brand-period">.</span>
         </a>
-        <div className="sidebar-section-label">YOUR VOTING COMPANION</div>
         <nav aria-label="Main navigation">
           {(
             [
-              { id: "ballot", label: "My ballot", icon: ClipboardCheck },
+              { id: "ballot", label: "Ballot", icon: ClipboardCheck },
               {
                 id: "priorities",
-                label: "My priorities",
+                label: "Priorities",
                 icon: SlidersHorizontal,
               },
-              { id: "matches", label: "My matches", icon: UsersRound },
+              { id: "matches", label: "Matches", icon: UsersRound },
             ] as const
           ).map((item) => (
             <button
@@ -317,38 +262,6 @@ function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-note">
-          <span className="note-icon">
-            <Sparkles size={19} />
-          </span>
-          <h3>
-            A little reflection.
-            <br />A more confident vote.
-          </h3>
-          <p>
-            You bring your values.
-            <br />
-            We help connect the dots.
-          </p>
-          <button
-            onClick={() => {
-              setQuestionIndex(0);
-              navigate("priorities");
-            }}
-          >
-            Find my matches <ArrowUpRight size={15} />
-          </button>
-        </div>
-        <div className="sidebar-bottom">
-          <div className="independent-label">
-            <span />
-            Independent. Always.
-          </div>
-          <button onClick={() => setDialog("method")}>
-            <CircleHelp size={17} /> About Ballotwise <ArrowUpRight size={14} />
-          </button>
-          <p>Made for a more informed you.</p>
-        </div>
       </aside>
       <div className="app-body">
         <header className="topbar">
@@ -359,20 +272,14 @@ function App() {
           >
             <Menu size={22} />
           </button>
-          <span className="topbar-tagline">
-            A little clarity for your next big decision.
-          </span>
-          <div className="topbar-actions">
-            <button className="how-button" onClick={() => setDialog("method")}>
-              <CircleHelp size={16} />
-              <span>How it works</span>
-            </button>
-            <span className="topbar-divider" />
-            <div className="private-label">
-              <ShieldCheck size={16} />
-              <span>Private by design</span>
-            </div>
-          </div>
+
+          <button
+            className="icon-button header-help"
+            aria-label="Scoring and privacy"
+            onClick={() => setDialog("method")}
+          >
+            <CircleHelp size={18} />
+          </button>
         </header>
         <main id="main-content" ref={mainRef}>
           {notice && (
@@ -392,102 +299,30 @@ function App() {
             <>
               <div className="page-heading">
                 <div>
-                  <div className="eyebrow">YOUR VOICE. YOUR VOTE.</div>
-                  <h1>
-                    Good decisions start here<span>.</span>
-                  </h1>
-                  <p>
-                    Get to know your ballot. Find where you stand. Vote with
-                    confidence.
-                  </p>
+                  <h1>Ballot</h1>
                 </div>
-                <button
-                  className="button button-white import-top"
-                  onClick={() => {
-                    setImportError("");
-                    setDialog("import");
-                  }}
-                >
-                  <Upload size={16} /> Import a ballot
-                </button>
-              </div>
-              <section className="hero-card">
-                <div className="hero-copy">
-                  <span className="pill hero-pill">
-                    <span />A VOTE THAT FEELS LIKE YOU
-                  </span>
-                  <h2>
-                    Your ballot.
-                    <br />
-                    Your values.
-                    <br />
-                    <span>A clearer choice.</span>
-                  </h2>
-                  <p>
-                    A few thoughtful questions can bring your ballot into focus.
-                    See which candidates align with what matters to you.
-                  </p>
+                <div className="heading-actions">
                   <button
                     className="button button-dark"
+                    onClick={() => navigate("priorities")}
+                  >
+                    {answered ? "Continue" : "Answer questions"}
+                    <ArrowRight size={16} />
+                  </button>
+                  <button
+                    className="button button-white import-top"
                     onClick={() => {
-                      setQuestionIndex(0);
-                      navigate("priorities");
+                      setImportError("");
+                      setDialog("import");
                     }}
                   >
-                    {answered ? "Continue my questions" : "Discover my matches"}
-                    <ArrowRight size={17} />
+                    <Upload size={16} /> Import
                   </button>
-                  <span className="hero-meta">
-                    <Clock3 size={13} /> About 3 minutes <span>·</span> No
-                    sign-up needed
-                  </span>
                 </div>
-                <BallotIllustration />
-              </section>
-              <section
-                className="journey-grid"
-                aria-label="How Ballotwise works"
-              >
-                <div>
-                  <span className="step-icon sage">
-                    <ClipboardCheck size={20} />
-                  </span>
-                  <div>
-                    <h3>
-                      <span>01</span> Explore your ballot
-                    </h3>
-                    <p>The people and decisions on your ballot.</p>
-                  </div>
-                </div>
-                <div>
-                  <span className="step-icon sand">
-                    <SlidersHorizontal size={20} />
-                  </span>
-                  <div>
-                    <h3>
-                      <span>02</span> Share your priorities
-                    </h3>
-                    <p>A few questions. The issues you care about.</p>
-                  </div>
-                </div>
-                <div>
-                  <span className="step-icon lavender">
-                    <UsersRound size={20} />
-                  </span>
-                  <div>
-                    <h3>
-                      <span>03</span> Find your alignment
-                    </h3>
-                    <p>Compare candidates, on your terms.</p>
-                  </div>
-                </div>
-              </section>
+              </div>
               <section className="ballot-section">
                 <div className="section-title-row">
-                  <div>
-                    <h2>A closer look at your ballot</h2>
-                    <p>Get familiar with the choices ahead.</p>
-                  </div>
+                  <h2>{ballot.title}</h2>
                   <span className="pill demo-pill">
                     {ballot.isDemo ? (
                       <>
@@ -506,10 +341,7 @@ function App() {
                   </span>
                   <div>
                     <strong>{ballot.location}</strong>
-                    <span>
-                      {ballot.title} <span className="dot-separator">·</span>{" "}
-                      {electionDate}
-                    </span>
+                    <span>{electionDate}</span>
                   </div>
                   <button
                     onClick={() => {
@@ -527,14 +359,14 @@ function App() {
                       Contests <b>{ballot.contests.length}</b>
                     </span>
                     <span className="ballot-candidate-total">
-                      {totalCandidates} candidates to explore
+                      {totalCandidates} candidates
                     </span>
                   </div>
                   <label className="search-box">
                     <Search size={16} />
                     <input
                       aria-label="Search contests or candidates"
-                      placeholder="Find a race or candidate"
+                      placeholder="Search ballot"
                       value={search}
                       onChange={(event) => setSearch(event.target.value)}
                     />
@@ -590,7 +422,7 @@ function App() {
                               navigate("matches");
                             }}
                           >
-                            Explore this race
+                            View candidates
                             <ArrowUpRight size={17} />
                           </button>
                         </article>
@@ -614,62 +446,32 @@ function App() {
                     </button>
                   </div>
                 )}
-                {ballot.isDemo ? (
-                  <p className="sample-disclaimer">
-                    <Info size={14} />
-                    <span>
-                      A little practice before the real thing. This sample uses
-                      fictional candidates and positions.{" "}
-                      <button onClick={() => setDialog("import")}>
-                        Bring your own ballot <ArrowUpRight size={12} />
-                      </button>
-                    </span>
-                  </p>
-                ) : (
-                  <p className="sample-disclaimer">
-                    <Info size={14} />
-                    <span>
-                      Imported ballot data is supplied by you. Check candidate
-                      position sources before relying on a match.
-                    </span>
-                  </p>
-                )}
+                <p className="sample-disclaimer">
+                  <Info size={14} />
+                  {ballot.isDemo
+                    ? "Fictional candidates and positions."
+                    : "Positions supplied in your imported ballot."}
+                </p>
               </section>
-              <div className="bottom-promise">
-                <span>
-                  <Fingerprint size={18} /> Your opinions stay in this tab.
-                </span>
-                <span>No parties to please. Just your priorities.</span>
-                <Leaf size={16} />
-              </div>
             </>
           )}
           {page === "priorities" && (
             <>
               <div className="page-heading">
                 <div>
-                  <div className="eyebrow">
-                    A FEW QUESTIONS. A LITTLE CLARITY.
-                  </div>
-                  <h1>
-                    What matters to you<span>?</span>
-                  </h1>
-                  <p>
-                    No right answers. No labels. Just your perspective on the
-                    issues.
-                  </p>
+                  <h1>Priorities</h1>
                 </div>
                 <button
                   className="button button-white"
                   onClick={() => setDialog("method")}
                 >
-                  <Scale size={16} /> How we match
+                  <Scale size={16} /> Scoring
                 </button>
               </div>
               <div className="question-layout">
                 <section className="question-card">
                   <div className="question-progress">
-                    <span>YOUR PRIORITIES</span>
+                    <span>Questionnaire</span>
                     <span>
                       Question {questionIndex + 1}{" "}
                       <span className="muted">
@@ -690,9 +492,12 @@ function App() {
                       {currentQuestion.topic}
                     </span>
                     <h2>{currentQuestion.title}</h2>
-                    <p className="question-explanation">
-                      {currentQuestion.description}
-                    </p>
+                    <details className="question-context">
+                      <summary>Context</summary>
+                      <p className="question-explanation">
+                        {currentQuestion.description}
+                      </p>
+                    </details>
                     <fieldset className="answer-choices">
                       <legend>How much do you agree?</legend>
                       {choices.map((label, index) => (
@@ -711,7 +516,7 @@ function App() {
                             {currentAnswer?.value === index - 2 && <span />}
                           </span>
                           <span>{label}</span>
-                          <span className="choice-symbol">
+                          <span className="choice-symbol" aria-hidden="true">
                             {index < 2 ? "−" : index === 2 ? "·" : "+"}
                           </span>
                         </label>
@@ -729,7 +534,7 @@ function App() {
                           currentAnswer?.weight === 2 ? "currentColor" : "none"
                         }
                       />
-                      <span>This issue is especially important to me</span>
+                      <span>Weight this issue ×2</span>
                       <span className="importance-check">
                         {currentAnswer?.weight === 2 && <Check size={12} />}
                       </span>
@@ -744,7 +549,7 @@ function App() {
                         Back
                       </button>
                       <button className="skip-button" onClick={skipQuestion}>
-                        Skip this question
+                        Skip
                       </button>
                       <button
                         className="button button-dark"
@@ -752,62 +557,25 @@ function App() {
                         onClick={advance}
                       >
                         {questionIndex === ballot.questions.length - 1
-                          ? "See my matches"
+                          ? "View matches"
                           : "Next question"}
                         <ArrowRight size={17} />
                       </button>
                     </div>
                   </div>
                 </section>
-                <aside className="question-aside">
-                  <span className="aside-illustration">
-                    <Heart size={29} strokeWidth={1.4} />
-                    <Sparkles size={18} />
-                  </span>
-                  <h3>
-                    Your perspective
-                    <br />
-                    belongs here.
-                  </h3>
-                  <p>
-                    Think about the community you want to live in. We’ll connect
-                    your answers to candidate positions.
-                  </p>
-                  <div className="aside-rule" />
-                  <div className="aside-point">
-                    <Check size={16} />
-                    <span>Skip anything you’re unsure about.</span>
-                  </div>
-                  <div className="aside-point">
-                    <Check size={16} />
-                    <span>Give extra weight to your biggest priorities.</span>
-                  </div>
-                  <div className="aside-point">
-                    <Check size={16} />
-                    <span>Come back and change your answers anytime.</span>
-                  </div>
-                  <div className="answer-count">
-                    <strong>
-                      {answered}
-                      <span> / {ballot.questions.length}</span>
-                    </strong>
-                    <span>questions answered</span>
-                    <div className="progress-track">
-                      <div style={{ width: `${progress}%` }} />
-                    </div>
-                  </div>
-                  <button
-                    className="text-button"
-                    onClick={() => navigate("matches")}
-                  >
-                    Preview my matches
-                    <ArrowRight size={15} />
-                  </button>
-                </aside>
               </div>
-              <div className="privacy-note">
-                <ShieldCheck size={16} /> Your answers stay in this browser tab
-                and disappear when you close or refresh it.
+              <div className="question-footer">
+                <span>
+                  {answered} / {ballot.questions.length} answered
+                </span>
+                <button
+                  className="text-button"
+                  onClick={() => navigate("matches")}
+                >
+                  Preview matches
+                  <ArrowRight size={15} />
+                </button>
               </div>
             </>
           )}
@@ -815,63 +583,23 @@ function App() {
             <>
               <div className="page-heading">
                 <div>
-                  <div className="eyebrow">YOUR VALUES, IN PERSPECTIVE.</div>
-                  <h1>
-                    {answered ? "Meet your matches" : "Meet the candidates"}
-                    <span>.</span>
-                  </h1>
-                  <p>
-                    {answered
-                      ? "A starting point for your research, shaped by what matters to you."
-                      : "Explore each race, then share your priorities to see your alignment."}
-                  </p>
+                  <h1>{answered ? "Matches" : "Candidates"}</h1>
                 </div>
                 <button
                   className="button button-white"
                   onClick={() => navigate("priorities")}
                 >
                   <SlidersHorizontal size={16} />
-                  {answered ? "Edit my answers" : "Answer questions"}
+                  {answered ? "Edit answers" : "Answer questions"}
                 </button>
               </div>
-              {ballot.isDemo && (
-                <div className="demo-banner">
-                  <Sparkles size={18} />
-                  <span>
-                    <strong>A practice ballot.</strong> All candidates and
-                    positions shown here are fictional.
-                  </span>
-                  <button onClick={() => setDialog("import")}>
-                    Import your ballot
-                    <ArrowUpRight size={14} />
-                  </button>
-                </div>
-              )}
-              <div className="match-summary">
-                <div className="summary-icon">
-                  <CheckCheck size={25} />
-                </div>
-                <div>
-                  <h3>
-                    {answered
-                      ? "Your priorities are taking shape."
-                      : "Your priorities bring the picture into focus."}
-                  </h3>
-                  <p>
-                    {answered
-                      ? `${answered} of ${ballot.questions.length} questions answered. You can refine your answers anytime.`
-                      : "Answer a few questions to compare your views with each candidate’s positions."}
-                  </p>
-                </div>
-                <button
-                  className="text-button"
-                  onClick={() => navigate("priorities")}
-                >
-                  {answered === ballot.questions.length
-                    ? "Review answers"
-                    : "Keep exploring"}
-                  <ArrowRight size={16} />
-                </button>
+              <div className="results-meta">
+                <span>
+                  {answered} / {ballot.questions.length} answered
+                </span>
+                {ballot.isDemo && (
+                  <span className="pill demo-pill">Fictional sample</span>
+                )}
               </div>
               <div className="results-layout">
                 <section className="results-main">
@@ -945,14 +673,16 @@ function App() {
                               </strong>
                               <span>
                                 {match.score === null
-                                  ? match.answeredCount > 0 ? "No known positions" : "Answer to compare"
+                                  ? match.answeredCount > 0
+                                    ? "No known positions"
+                                    : "Answer to compare"
                                   : tied
                                     ? "alignment · tied"
                                     : "alignment"}
                               </span>
                             </div>
                           </div>
-                          <p className="candidate-bio">{match.candidate.bio}</p>
+
                           <div className="match-card-bottom">
                             <span
                               className={
@@ -963,7 +693,7 @@ function App() {
                             >
                               <span />
                               {match.comparedCount} of {match.answeredCount}{" "}
-                              answered positions known
+                              positions compared
                               {match.coverage < 100 && match.answeredCount > 0
                                 ? " · Limited data"
                                 : ""}
@@ -977,8 +707,7 @@ function App() {
                           </div>
                           {match.score !== null && match.comparedCount < 3 && (
                             <p className="sparse-warning">
-                              Early match: based on fewer than 3 positions.
-                              Answer more questions before drawing conclusions.
+                              Limited sample: fewer than 3 positions compared.
                             </p>
                           )}
                         </article>
@@ -986,43 +715,14 @@ function App() {
                     })}
                   </div>
                 </section>
-                <aside className="results-aside">
-                  <span className="aside-icon">
-                    <Scale size={23} />
-                  </span>
-                  <h3>
-                    A match is a<br />
-                    starting point.
-                  </h3>
-                  <p>
-                    These results compare issue positions. They don’t measure a
-                    candidate’s experience, character, or ability to deliver.
-                  </p>
-                  <button
-                    className="text-button"
-                    onClick={() => setDialog("method")}
-                  >
-                    Understand the math
-                    <ArrowUpRight size={14} />
-                  </button>
-                  <div className="aside-rule" />
-                  <h4>Keep your curiosity.</h4>
-                  <p>
-                    Read the sources. Explore a candidate’s record. There’s more
-                    to a good choice than a percentage.
-                  </p>
-                  {answered > 0 && (
-                    <button className="reset-button" onClick={resetAnswers}>
-                      <RotateCcw size={14} /> Clear my answers
-                    </button>
-                  )}
-                </aside>
               </div>
               <div className="bottom-promise">
-                <span>
-                  <ShieldCheck size={18} /> Independent comparisons. Your
-                  decision.
-                </span>
+                {answered > 0 && (
+                  <button className="reset-button" onClick={resetAnswers}>
+                    <RotateCcw size={14} />
+                    Clear answers
+                  </button>
+                )}
                 <button
                   onClick={() =>
                     download(
@@ -1056,23 +756,6 @@ function App() {
               </div>
             </>
           )}
-          <footer>
-            <a
-              className="footer-brand"
-              href="#"
-              onClick={(event) => {
-                event.preventDefault();
-                navigate("ballot");
-              }}
-            >
-              ballotwise.
-            </a>
-            <span>A clearer ballot. A more confident you.</span>
-            <button onClick={() => setDialog("method")}>
-              Our approach
-              <ArrowUpRight size={12} />
-            </button>
-          </footer>
         </main>
       </div>
       {dialog && (
@@ -1088,13 +771,8 @@ function App() {
                 <span className="modal-icon">
                   <Upload size={24} />
                 </span>
-                <div className="eyebrow">BRING YOUR BALLOT</div>
-                <h2>A ballot of your own.</h2>
-                <p>
-                  Import structured ballot data with candidates, issue
-                  questions, and documented positions. Importing replaces this
-                  ballot and clears your answers.
-                </p>
+                <h2>Import ballot</h2>
+                <p>Importing replaces your ballot and clears your answers.</p>
                 <button
                   className="upload-area"
                   onClick={() => fileInput.current?.click()}
@@ -1135,7 +813,6 @@ function App() {
                 <div className="import-help">
                   <Info size={16} />
                   <span>
-                    Need the format?{" "}
                     <button
                       onClick={() =>
                         download(sampleBallot, "ballotwise-sample.json")
@@ -1143,9 +820,7 @@ function App() {
                     >
                       Download the sample JSON
                     </button>
-                    . Replace fictional data with verified candidate positions
-                    and source links. PDFs and photos need to be converted to
-                    this format first.
+                    . JSON only; PDFs and photos are not supported.
                   </span>
                 </div>
                 <div className="modal-actions">
@@ -1174,64 +849,34 @@ function App() {
                 <span className="modal-icon">
                   <Scale size={25} />
                 </span>
-                <div className="eyebrow">TRANSPARENT BY DESIGN</div>
-                <h2>Your values. Clear comparisons.</h2>
+                <h2>Scoring</h2>
                 <p>
-                  Ballotwise helps you explore candidate alignment using only
-                  the issue opinions you choose to share.
+                  Alignment = 100 × (1 − weighted average position distance ÷
+                  4). Positions range from −2 to +2. Weighted issues count
+                  twice.
                 </p>
-                <div className="method-step">
-                  <span>01</span>
-                  <div>
-                    <h3>You set the priorities</h3>
-                    <p>
-                      Choose a position from strongly disagree (−2) to strongly
-                      agree (+2). An especially important issue counts twice.
-                    </p>
-                  </div>
-                </div>
-                <div className="method-step">
-                  <span>02</span>
-                  <div>
-                    <h3>We compare documented positions</h3>
-                    <p>
-                      For each race, alignment is 100 × (1 − weighted average
-                      distance ÷ 4). Identical positions align 100%; opposite
-                      positions align 0%.
-                    </p>
-                  </div>
-                </div>
-                <div className="method-step">
-                  <span>03</span>
-                  <div>
-                    <h3>You see the full picture</h3>
-                    <p>
-                      Skipped answers and unknown positions don’t affect scores.
-                      We show how much information supports each match. Equal
-                      scores share a rank.
-                    </p>
-                  </div>
-                </div>
-                <div className="method-note">
-                  <ShieldCheck size={20} />
-                  <p>
-                    Your answers stay in this tab. No account, tracking, or
-                    opinion data sent to a server. Refreshing clears your
-                    answers and imported ballot.
-                  </p>
-                </div>
+                <p>
+                  Skipped answers and unknown positions are excluded. Coverage
+                  shows how much candidate data supports a score. Tied scores
+                  share a rank.
+                </p>
+                <h3 className="detail-heading method-privacy-heading">
+                  Privacy
+                </h3>
+                <p>
+                  Answers remain in this tab. Refreshing clears them and any
+                  imported ballot.
+                </p>
                 <p className="method-disclaimer">
-                  This is an issue comparison tool, not a voting recommendation
-                  or an official election resource. Sample candidates are
-                  fictional. Imported data should be checked against reliable
-                  sources.
+                  Scores compare issue positions, not overall candidate
+                  suitability. Sample candidates are fictional; imported
+                  positions are not independently verified.
                 </p>
                 <button
                   className="button button-dark full-width"
                   onClick={() => setDialog(null)}
                 >
-                  Sounds good
-                  <Check size={16} />
+                  Close
                 </button>
               </>
             )}
@@ -1371,10 +1016,8 @@ function CandidateDialog({
           <span>positions compared</span>
         </div>
       </div>
-      <h3 className="detail-heading">Where your views meet</h3>
-      <p className="detail-caption">
-        Positions use the same five-point agreement scale as your answers.
-      </p>
+      <h3 className="detail-heading">Positions</h3>
+      <p className="detail-caption">Agreement scale: −2 to +2.</p>
       <div className="comparison-list">
         {questions.map((question) => {
           const answer = answers[question.id];
@@ -1421,8 +1064,8 @@ function CandidateDialog({
       ) : (
         <p className="source-empty">
           {ballot.isDemo
-            ? "This is fictional example data; there are no real-world sources."
-            : "No source links supplied. Verify these positions independently before relying on this comparison."}
+            ? "Fictional sample; no sources."
+            : "No sources supplied."}
         </p>
       )}
     </>
