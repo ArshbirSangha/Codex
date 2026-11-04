@@ -1,43 +1,60 @@
 # Ballotwise
 
-A browser app that turns structured ballot information into opinion questions and ranks candidates by how closely their documented positions match your answers. Compare each race, adjust which issues matter most, and inspect the reasoning behind a match.
+Ballotwise compares a user’s policy preferences with candidate positions supplied in structured ballot data. Candidates are ranked within each race using a weighted alignment score.
 
-The included Riverbend City election is entirely fictional: **3 contests, 10 candidates, and 8 opinion questions**. All sample names, biographies, and positions are demonstration content.
+The default dataset is fictional. It contains ten candidates across three contests. The questionnaire contains eight statements. No sample candidate represents a real person.
 
-## Run locally
+## Local setup
 
-Use **Node.js 22.12 or newer**; Node.js 24 was tested.
+Install Node.js 22.12 or newer. The application was tested with Node.js 24.
+
+From the project directory, run:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually `http://localhost:5173`.
+Open the address printed in the terminal, normally http://localhost:5173.
+
+To check the application and generate a production build:
 
 ```sh
-npm run build   # Type-check and create a production build in dist/
-npm test        # Run ranking and import-validation tests
-npm run preview # Serve the production build locally
+npm test
+npm run build
 ```
 
-Built with React, TypeScript, and Vite. There is no backend or database.
+The build is written to `dist/`. Run `npm run preview` to serve it locally.
 
-## How comparisons work
+The interface uses React with TypeScript. Vite handles development and production builds. The application does not require a backend.
 
-Answer each statement on a five-point scale from **−2 (strongly disagree)** to **2 (strongly agree)**, with 0 representing a neutral opinion. You can skip questions and mark an answer as more important, giving it weight 2 instead of 1.
+## Scoring
 
-For each answered question relevant to a race, alignment is `100 × (1 − |your answer − candidate position| / 4)`. A candidate's score is the weighted average of comparable answers, rounded to a percentage. Equal scores share a rank.
+Responses use a five-point agreement scale from −2 to +2. Zero represents a neutral response. Skipped questions are excluded.
 
-An unknown or omitted candidate position is excluded from the score. **Coverage** is the percentage of your answered issue weight for which that candidate has a known position. No comparable positions means no score. A high score with low coverage has less supporting information; scores do not assess experience, character, or ability to deliver.
+Each response has a default weight of 1. Selecting “Weight this issue ×2” changes its weight to 2.
 
-Use **Export comparison** on the results screen to download your answers, rankings, and coverage as JSON. This comparison export is a report, not an importable ballot file.
+For each comparable position:
 
-## Import a ballot
+```text
+alignment = 100 × (1 − |user response − candidate position| ÷ 4)
+```
 
-Choose **Import a ballot**, then upload or paste a JSON file. Download the sample JSON from the import dialog for a complete template. The same data lives in [`src/data/sample-ballot.ts`](src/data/sample-ballot.ts); type definitions and validation are in [`src/lib/ballot.ts`](src/lib/ballot.ts).
+The candidate’s final score is the weighted average of these values, rounded to a percentage. Equal scores receive the same rank.
 
-Here is a minimal valid ballot. Every person, place, and position in this example is fictional.
+Missing candidate positions are excluded rather than treated as neutral. Coverage measures the proportion of answered issue weight supported by known candidate positions. A candidate receives no score when no comparison is possible.
+
+A high score with low coverage has limited supporting data. The score measures policy alignment. It does not assess a candidate’s qualifications or predict performance in office.
+
+Select “Export comparison” to download a JSON report containing your responses and the calculated results. Coverage is included for each candidate. This report cannot be imported as a ballot.
+
+## Custom ballots
+
+Select “Import” and upload a prepared JSON file, or paste its contents into the dialog. The dialog provides a downloadable sample.
+
+The sample dataset is available in `src/data/sample-ballot.ts`. Validation rules are implemented in `src/lib/ballot.ts`.
+
+The following example is a valid ballot. Its contents are fictional.
 
 ```json
 {
@@ -58,9 +75,11 @@ Here is a minimal valid ballot. Every person, place, and position in this exampl
           "name": "Rowan Ellis",
           "party": "Nonpartisan",
           "initials": "RE",
-          "color": "#55735b",
-          "bio": "A fictional candidate for this example.",
-          "positions": { "housing": 2 },
+          "color": "#bde5fa",
+          "bio": "Fictional candidate.",
+          "positions": {
+            "housing": 2
+          },
           "sources": []
         },
         {
@@ -68,9 +87,11 @@ Here is a minimal valid ballot. Every person, place, and position in this exampl
           "name": "Avery Lane",
           "party": "Nonpartisan",
           "initials": "AL",
-          "color": "#85709c",
-          "bio": "Another fictional candidate for this example.",
-          "positions": { "housing": -1 },
+          "color": "#e5f7c2",
+          "bio": "Fictional candidate.",
+          "positions": {
+            "housing": -1
+          },
           "sources": []
         }
       ]
@@ -81,21 +102,50 @@ Here is a minimal valid ballot. Every person, place, and position in this exampl
       "id": "housing",
       "topic": "Housing",
       "title": "The city should allow more apartments near transit.",
-      "description": "Consider housing supply, neighborhood density, and public services.",
+      "description": "Consider the effect on housing supply and neighborhood density.",
       "lowLabel": "Keep current density rules",
       "highLabel": "Allow more apartments",
-      "contestIds": ["mayor"]
+      "contestIds": [
+        "mayor"
+      ]
     }
   ]
 }
 ```
 
-All shown fields are required; a top-level `description` is optional. IDs must be unique within contests, candidates, and questions respectively. Each question references existing contests, and each contest needs a question. Candidate position keys reference questions relevant to their contest. Values must be integer −2, −1, 0, 1, or 2; use `null` or omit a key when a position is unknown. Colors use six-digit hex notation. Dates use `YYYY-MM-DD`.
+Every field shown above is required. A top-level `description` field is optional.
 
-For a real ballot, set `isDemo` to `false` and supply carefully researched candidate positions. A source is `{ "label": "Source title", "url": "https://…" }` using a complete HTTP(S) URL; empty source lists are allowed and displayed as unavailable. No real sources are claimed by the fictional samples. Imports are limited to 1 MB, 40 contests, 500 total candidates, and 200 questions.
+IDs must be unique within their category. Question references must identify existing contests. Each contest must have at least one associated question.
 
-## Scope and data
+Candidate position keys must identify questions relevant to that candidate’s contest. Position values must be integers from −2 through +2. Use `null` or omit the position when it is unknown.
 
-The app imports prepared JSON. It does not automatically extract a ballot from a PDF or image, discover candidates, research their positions, or fact-check linked sources. Prepare and verify that information before importing it.
+Dates must use `YYYY-MM-DD`. Candidate colors must use six-digit hexadecimal notation. The interface applies its own avatar palette.
 
-Answers and imported ballots stay in browser memory and clear when the page reloads. Importing another ballot resets your answers. There is no account, server-side storage, or saved session; export a comparison if you want to keep it. An exported comparison includes your opinions, so share that file intentionally.
+For real election data, set `isDemo` to `false`. Candidate positions must be researched before import. Source entries use this format:
+
+```json
+{
+  "label": "Candidate policy statement",
+  "url": "https://example.org/policy"
+}
+```
+
+Source URLs must use HTTP or HTTPS. Empty source lists are permitted but do not establish that a position has been verified.
+
+The input limit is 1 MB. A ballot may contain up to 40 contests and 500 candidates in total. The questionnaire limit is 200 questions.
+
+## Scope
+
+The application accepts prepared JSON. It does not extract ballot information from PDFs or photographs.
+
+Questions and candidate positions must already be included in the imported dataset. The application does not discover candidates or independently verify their positions. Source links are provided for inspection; their contents are not checked automatically.
+
+The fictional dataset demonstrates the comparison method. It should not be used to make an actual voting decision.
+
+## Data handling
+
+Responses remain in browser memory. Imported ballots are also held locally and are cleared when the page reloads.
+
+Importing a replacement ballot clears existing responses. Sessions are not saved automatically.
+
+An exported comparison contains the user’s opinions. Anyone receiving that file can read those responses.
